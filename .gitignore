@@ -1,0 +1,21 @@
+# Entornos virtuales
+venv/
+env/
+.venv/
+
+# Variables de entorno (API keys)
+.env
+
+# Base de datos vectorial (se genera localmente, no va al repo)
+chroma_db/
+
+# Documentos de prueba
+data/*.pdf
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Sistema
+.DS_Store
