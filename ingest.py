@@ -25,10 +25,12 @@ def extract_text(filepath: str) -> str:
         text = ""
         for page in reader.pages:
             text += page.extract_text() or ""
-        return text
     else:
         with open(filepath, "r", encoding="utf-8") as f:
-            return f.read()
+            text = f.read()
+
+    text = " ".join(text.split())
+    return text
 
 
 def chunk_text(text: str, chunk_size: int = CHUNK_SIZE, overlap: int = CHUNK_OVERLAP) -> list[str]:
@@ -48,7 +50,7 @@ def get_chroma_collection():
     """Crea o recupera la colección de Chroma, usando sentence-transformers como embedder."""
     client = chromadb.PersistentClient(path=CHROMA_PATH)
     embedder = embedding_functions.SentenceTransformerEmbeddingFunction(
-        model_name="all-MiniLM-L6-v2"  # modelo liviano, corre bien en CPU
+        model_name="all-MiniLM-L6-v2"  
     )
     collection = client.get_or_create_collection(
         name=COLLECTION_NAME,
@@ -77,6 +79,15 @@ def ingest_file(filepath: str) -> int:
         metadatas=metadatas,
     )
     return len(chunks)
+
+
+def reset_database():
+    """Borra todos los documentos indexados (sin tocar archivos en disco)."""
+    client = chromadb.PersistentClient(path=CHROMA_PATH)
+    try:
+        client.delete_collection(COLLECTION_NAME)
+    except Exception:
+        pass  # si la colección no existía, no hay nada que borrar
 
 
 if __name__ == "__main__":
