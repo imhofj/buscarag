@@ -54,15 +54,16 @@ Para cada pregunta se registra en qué posición aparece el fragmento correcto e
 
 ### Resultados
 
-| Etapa | Acierto@4 | Acierto@1 | MRR | Respondió* | Se abstuvo** |
+| Etapa | Acierto@4 | Acierto@1 | MRR | Respondió | Se abstuvo |
 |---|---|---|---|---|---|
 | Inicial (`all-MiniLM-L6-v2`) | 68% | 26% | 0.42 | 68% | 100% |
 | Embeddings multilingües | 89% | 63% | 0.73 | 79% | 100% |
 | Embeddings multilingües + prompt ajustado | **89%** | **63%** | **0.73** | **89%** | **100%** |
 
-\* Porcentaje de preguntas con respuesta en las que el modelo respondió en lugar de abstenerse.
-\** Porcentaje de preguntas sin respuesta en las que el modelo dijo que no encontró la información.
-Los valores de "Respondió" de las dos primeras filas se recalcularon con el criterio de detección final, porque la primera versión del script clasificaba mal algunas respuestas.
+> **Respondió**: porcentaje de preguntas con respuesta en las que el modelo respondió en lugar de abstenerse.
+> **Se abstuvo**: porcentaje de preguntas sin respuesta en las que el modelo dijo que no encontró la información.
+>
+> Los valores de "Respondió" de las dos primeras filas se recalcularon con el criterio de detección final, porque la primera versión del script clasificaba mal algunas respuestas.
 
 ### Qué se aprendió
 
