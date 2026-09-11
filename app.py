@@ -22,26 +22,50 @@ import streamlit as st
 from ingest import ingest_file, get_chroma_collection, reset_database
 from rag import answer_question_stream
 
+# Documento de ejemplo incluido en el repo, para probar la app con un clic
+CARPETA_APP = os.path.dirname(os.path.abspath(__file__))
+PDF_EJEMPLO = os.path.join(CARPETA_APP, "ejemplos", "politica_cobranzas_ceibo.pdf")
+NOMBRE_EJEMPLO = os.path.basename(PDF_EJEMPLO)
+# Preguntas parafraseadas que el sistema respondió bien en la evaluación (eval/)
+PREGUNTAS_EJEMPLO = [
+    "¿Qué tiene que hacer el operador si la persona empieza a insultar?",
+    "¿En qué casos el bot tiene que pasarle la llamada a una persona?",
+    "Si alguien se quedó sin trabajo, ¿se le puede dar un respiro en las llamadas?",
+]
+
+
+def ejemplo_ya_cargado() -> bool:
+    """Indica si el documento de ejemplo ya está indexado en la base."""
+    try:
+        resultado = get_chroma_collection().get(where={"source": NOMBRE_EJEMPLO}, limit=1)
+        return len(resultado["ids"]) > 0
+    except Exception:
+        return False
+
+
+def usar_pregunta(pregunta: str):
+    """Callback de los botones de preguntas de ejemplo: completa el campo de texto."""
+    st.session_state["pregunta"] = pregunta
+
 st.set_page_config(page_title="Buscador Semántico", page_icon="🔍")
 st.title("🔍 Buscador Semántico de Documentos")
 st.caption("Subí tus documentos y hacé preguntas sobre su contenido en lenguaje natural.")
 
-# --- Barra lateral: estado de la base + reset ---
-with st.sidebar:
-    st.subheader("Base de documentos")
-    try:
-        collection = get_chroma_collection()
-        st.write(f"Fragmentos indexados: **{collection.count()}**")
-    except Exception:
-        st.write("Fragmentos indexados: 0")
-
-    if st.button("🗑️ Borrar todo y empezar de cero"):
-        reset_database()
-        st.success("Base borrada. Subí documentos de nuevo.")
-        st.rerun()
-
 # --- Sección 1: subir documentos ---
 st.header("1. Subir documentos")
+
+if st.button("📄 Probar con un documento de ejemplo"):
+    if ejemplo_ya_cargado():
+        st.info("El documento de ejemplo ya está cargado. Probá con alguna de las preguntas de abajo.")
+    else:
+        with st.spinner("Cargando la política de cobranzas de ejemplo..."):
+            n = ingest_file(PDF_EJEMPLO)
+        st.success(f"Documento de ejemplo cargado: {n} fragmentos indexados.")
+st.caption(
+    "El ejemplo es la política de cobranzas de Financiera Ceibo, una empresa ficticia. "
+    "También podés subir tus propios archivos:"
+)
+
 uploaded_files = st.file_uploader(
     "Subí uno o más PDFs o TXT", type=["pdf", "txt"], accept_multiple_files=True
 )
@@ -71,7 +95,14 @@ if uploaded_files and st.button("Procesar documentos"):
 
 # --- Sección 2: preguntar ---
 st.header("2. Hacé una pregunta")
-query = st.text_input("¿Qué querés saber sobre tus documentos?")
+
+if ejemplo_ya_cargado():
+    st.write("Preguntas de ejemplo:")
+    columnas = st.columns(len(PREGUNTAS_EJEMPLO))
+    for columna, pregunta in zip(columnas, PREGUNTAS_EJEMPLO):
+        columna.button(pregunta, on_click=usar_pregunta, args=(pregunta,), use_container_width=True)
+
+query = st.text_input("¿Qué querés saber sobre tus documentos?", key="pregunta")
 
 if query:
     with st.spinner("Buscando fragmentos relevantes..."):
@@ -95,3 +126,19 @@ if query:
         for i, source in enumerate(fragments, start=1):
             with st.expander(f"Fragmento {i} — {source['source']}"):
                 st.write(source["text"])
+
+# --- Barra lateral: estado de la base + reset ---
+# Va al final del script para que el contador ya incluya los documentos
+# cargados en esta misma ejecución (Streamlit la muestra igual a la izquierda).
+with st.sidebar:
+    st.subheader("Base de documentos")
+    try:
+        collection = get_chroma_collection()
+        st.write(f"Fragmentos indexados: **{collection.count()}**")
+    except Exception:
+        st.write("Fragmentos indexados: 0")
+
+    if st.button("🗑️ Borrar todo y empezar de cero"):
+        reset_database()
+        st.success("Base borrada. Subí documentos de nuevo.")
+        st.rerun()
