@@ -6,6 +6,15 @@ Interfaz visual con Streamlit:
 - Ver la respuesta generada junto con las fuentes que la sustentan
 """
 
+# Streamlit Cloud trae una versión vieja de sqlite3 que ChromaDB no acepta.
+# En Linux la reemplazamos por pysqlite3; en Windows no se instala y se ignora.
+try:
+    __import__("pysqlite3")
+    import sys
+    sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
+except ImportError:
+    pass
+
 import os
 import tempfile
 import streamlit as st

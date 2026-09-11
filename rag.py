@@ -10,6 +10,7 @@ import os
 from dotenv import load_dotenv
 from groq import Groq
 from ingest import get_chroma_collection
+MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
 
 load_dotenv()
 
@@ -52,8 +53,8 @@ def answer_question(query: str, n_results: int = 4) -> dict:
     prompt = build_prompt(query, fragments)
 
     response = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
-        max_tokens=500,
+        model=MODEL,
+        max_tokens=1024,
         messages=[{"role": "user", "content": prompt}],
     )
 
