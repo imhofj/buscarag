@@ -1,4 +1,4 @@
-# Buscador Semántico de Documentos (RAG)
+# Buscarag: Buscador Semántico de Documentos (RAG)
 
 Sistema de **Retrieval-Augmented Generation (RAG)** que permite subir documentos (PDF/TXT) y hacer preguntas sobre su contenido en lenguaje natural. A diferencia de un buscador tradicional, que busca coincidencias exactas de palabras, este sistema entiende el **significado** de la consulta gracias a embeddings semánticos, y genera una respuesta a partir de los fragmentos más relevantes de los documentos.
 
