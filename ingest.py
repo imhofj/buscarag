@@ -69,6 +69,11 @@ def ingest_file(filepath: str) -> int:
     text = extract_text(filepath)
     chunks = chunk_text(text)
 
+    # Si no se pudo extraer texto (por ejemplo, un PDF escaneado), no hay nada
+    # que guardar. Chroma no acepta listas vacías, así que cortamos acá.
+    if not chunks:
+        return 0
+
     collection = get_chroma_collection()
 
     ids = [f"{filename}-{i}" for i in range(len(chunks))]
