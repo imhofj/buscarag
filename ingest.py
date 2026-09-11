@@ -16,6 +16,7 @@ CHROMA_PATH = "chroma_db"
 COLLECTION_NAME = "documentos"
 CHUNK_SIZE = 500       # caracteres por fragmento
 CHUNK_OVERLAP = 50     # superposición entre fragmentos, para no cortar ideas
+EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "paraphrase-multilingual-MiniLM-L12-v2")
 
 
 def extract_text(filepath: str) -> str:
@@ -50,7 +51,7 @@ def get_chroma_collection():
     """Crea o recupera la colección de Chroma, usando sentence-transformers como embedder."""
     client = chromadb.PersistentClient(path=CHROMA_PATH)
     embedder = embedding_functions.SentenceTransformerEmbeddingFunction(
-        model_name="all-MiniLM-L6-v2"  
+        model_name=EMBEDDING_MODEL
     )
     collection = client.get_or_create_collection(
         name=COLLECTION_NAME,

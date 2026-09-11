@@ -1,0 +1,117 @@
+[
+  {
+    "pregunta": "¿Qué área es responsable de mantener actualizada la política?",
+    "tipo": "literal",
+    "debe_contener": "La Gerencia de Riesgo es la responsable"
+  },
+  {
+    "pregunta": "¿Desde qué momento se considera que un crédito está en mora?",
+    "tipo": "literal",
+    "debe_contener": "primer día posterior a su fecha de vencimiento"
+  },
+  {
+    "pregunta": "¿En qué horario se puede llamar a los clientes los sábados?",
+    "tipo": "literal",
+    "debe_contener": "sábados entre las 9:00 y las 13:00 horas"
+  },
+  {
+    "pregunta": "¿Cuál es la quita máxima autorizada?",
+    "tipo": "literal",
+    "debe_contener": "quita máxima autorizada es del 30%"
+  },
+  {
+    "pregunta": "¿Cuándo se envía el recordatorio de una promesa de pago?",
+    "tipo": "literal",
+    "debe_contener": "El día anterior a la fecha comprometida"
+  },
+  {
+    "pregunta": "¿Cuál es el objetivo para la tasa de cumplimiento de promesas?",
+    "tipo": "literal",
+    "debe_contener": "este indicador es del 65%"
+  },
+  {
+    "pregunta": "¿Cómo se decide a qué clientes llamar primero?",
+    "tipo": "parafraseada",
+    "debe_contener": "priorizar el orden de las llamadas"
+  },
+  {
+    "pregunta": "¿Qué pasa con las deudas que llevan más de seis meses sin pagarse?",
+    "tipo": "parafraseada",
+    "debe_contener": "se considera de difícil recuperación"
+  },
+  {
+    "pregunta": "¿Cuántas veces al día se puede intentar llamar a una misma persona?",
+    "tipo": "parafraseada",
+    "debe_contener": "máximo de tres intentos de llamada por día"
+  },
+  {
+    "pregunta": "¿Se les puede avisar a los parientes del deudor que debe plata?",
+    "tipo": "parafraseada",
+    "debe_contener": "Está prohibido contactar a familiares"
+  },
+  {
+    "pregunta": "¿Cómo se comprueba que se habla con el titular antes de mencionar lo que debe?",
+    "tipo": "parafraseada",
+    "debe_contener": "últimos cuatro dígitos de su documento"
+  },
+  {
+    "pregunta": "¿Qué tiene que hacer el operador si la persona empieza a insultar?",
+    "tipo": "parafraseada",
+    "debe_contener": "el gestor debe mantener la calma"
+  },
+  {
+    "pregunta": "¿En cuántos pagos mensuales como máximo se puede refinanciar una deuda?",
+    "tipo": "parafraseada",
+    "debe_contener": "plazo máximo de un acuerdo es de 12 cuotas"
+  },
+  {
+    "pregunta": "¿Cuánto hay que pagar de entrada para cerrar un arreglo?",
+    "tipo": "parafraseada",
+    "debe_contener": "pago inicial de al menos el 10%"
+  },
+  {
+    "pregunta": "¿Qué ocurre si un cliente no cumple dos veces seguidas lo que prometió?",
+    "tipo": "parafraseada",
+    "debe_contener": "incumple dos promesas consecutivas"
+  },
+  {
+    "pregunta": "¿En qué casos el bot tiene que pasarle la llamada a una persona?",
+    "tipo": "parafraseada",
+    "debe_contener": "derivarse de inmediato a un gestor humano"
+  },
+  {
+    "pregunta": "¿Por cuánto tiempo se guardan las grabaciones de las llamadas automáticas?",
+    "tipo": "parafraseada",
+    "debe_contener": "se conservan durante dos años"
+  },
+  {
+    "pregunta": "¿Se pueden usar los datos de los clientes para entrenar inteligencias artificiales de otras empresas?",
+    "tipo": "parafraseada",
+    "debe_contener": "no se usen para entrenar modelos de terceros"
+  },
+  {
+    "pregunta": "Si alguien se quedó sin trabajo, ¿se le puede dar un respiro en las llamadas?",
+    "tipo": "parafraseada",
+    "debe_contener": "por un período de hasta 60 días"
+  },
+  {
+    "pregunta": "¿Cuál es la tasa de interés de los préstamos personales?",
+    "tipo": "sin_respuesta",
+    "debe_contener": null
+  },
+  {
+    "pregunta": "¿Quién es el gerente general de Financiera Ceibo?",
+    "tipo": "sin_respuesta",
+    "debe_contener": null
+  },
+  {
+    "pregunta": "¿Cuántos gestores humanos tiene el equipo de cobranza?",
+    "tipo": "sin_respuesta",
+    "debe_contener": null
+  },
+  {
+    "pregunta": "¿Qué pasa si el cliente vive en el exterior?",
+    "tipo": "sin_respuesta",
+    "debe_contener": null
+  }
+]

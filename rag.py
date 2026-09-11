@@ -47,8 +47,15 @@ def build_prompt(query: str, fragments: list[dict]) -> str:
     context = "\n\n".join(
         f"[Fuente: {f['source']}]\n{f['text']}" for f in fragments
     )
-    return f"""Respondé la siguiente pregunta usando ÚNICAMENTE la información del contexto.
-Si el contexto no tiene la respuesta, decí explícitamente que no la encontraste en los documentos.
+    return f"""Respondé la pregunta usando ÚNICAMENTE la información del contexto.
+
+Tené en cuenta que la pregunta puede usar palabras distintas a las del documento
+(por ejemplo, "sueldo" en vez de "salario", o "arreglar" en vez de "reparar").
+Si el contexto contiene la información aunque esté dicha con otras palabras, respondé.
+
+Respondé de forma breve y directa, mencionando el dato concreto.
+Solo si el contexto realmente no contiene la respuesta, respondé exactamente:
+"No encontré esa información en los documentos."
 
 Contexto:
 {context}
