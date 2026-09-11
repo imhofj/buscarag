@@ -4,17 +4,32 @@ Se encarga de:
 1. Buscar en Chroma los fragmentos más relevantes para una pregunta
 2. Armar un prompt con esos fragmentos como contexto
 3. Pedirle a un modelo (via Groq) que genere una respuesta basada en ese contexto
+4. Medir la latencia de cada etapa (búsqueda, primer token y respuesta completa)
 """
 
 import os
+import time
 from dotenv import load_dotenv
 from groq import Groq
 from ingest import get_chroma_collection
-MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
 
+# load_dotenv() tiene que ir ANTES de leer las variables de entorno,
+# si no, los valores del .env se ignoran.
 load_dotenv()
 
+MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
+
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+# Parámetros comunes para todas las llamadas al modelo.
+# gpt-oss es un modelo de razonamiento: con esfuerzo "low" piensa menos antes
+# de responder, lo que reduce bastante el tiempo hasta el primer token.
+# (Si se cambia a un modelo que no sea de razonamiento, sacar "extra_body").
+GENERATION_PARAMS = {
+    "model": MODEL,
+    "max_tokens": 1024,
+    "extra_body": {"reasoning_effort": "low"},
+}
 
 
 def search(query: str, n_results: int = 4):
@@ -44,7 +59,7 @@ Respuesta:"""
 
 
 def answer_question(query: str, n_results: int = 4) -> dict:
-    """Pipeline completo de RAG: busca fragmentos y genera una respuesta."""
+    """Pipeline completo de RAG sin streaming (útil para tests y evaluación)."""
     fragments = search(query, n_results=n_results)
 
     if not fragments:
@@ -53,10 +68,51 @@ def answer_question(query: str, n_results: int = 4) -> dict:
     prompt = build_prompt(query, fragments)
 
     response = client.chat.completions.create(
-        model=MODEL,
-        max_tokens=1024,
         messages=[{"role": "user", "content": prompt}],
+        **GENERATION_PARAMS,
     )
 
     answer = response.choices[0].message.content
     return {"answer": answer, "sources": fragments}
+
+
+def answer_question_stream(query: str, n_results: int = 4):
+    """
+    Pipeline de RAG con streaming y medición de latencia.
+
+    Devuelve una tupla (fragments, stream, metrics):
+    - fragments: los fragmentos recuperados de Chroma
+    - stream: generador que va entregando la respuesta de a pedacitos
+      (None si no hay documentos cargados)
+    - metrics: diccionario con los tiempos en segundos. "search_s" está
+      disponible enseguida; "first_token_s" y "generation_s" se completan
+      a medida que se consume el stream.
+    """
+    start = time.perf_counter()
+    fragments = search(query, n_results=n_results)
+    metrics = {"search_s": time.perf_counter() - start}
+
+    if not fragments:
+        return fragments, None, metrics
+
+    prompt = build_prompt(query, fragments)
+
+    def generate():
+        gen_start = time.perf_counter()
+        stream = client.chat.completions.create(
+            messages=[{"role": "user", "content": prompt}],
+            stream=True,
+            **GENERATION_PARAMS,
+        )
+        for chunk in stream:
+            if not chunk.choices:
+                continue
+            text = chunk.choices[0].delta.content
+            if text:
+                # Tiempo hasta el primer token: lo que el usuario percibe como "espera"
+                if "first_token_s" not in metrics:
+                    metrics["first_token_s"] = time.perf_counter() - gen_start
+                yield text
+        metrics["generation_s"] = time.perf_counter() - gen_start
+
+    return fragments, generate(), metrics

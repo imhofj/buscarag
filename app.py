@@ -3,7 +3,8 @@ app.py
 Interfaz visual con Streamlit:
 - Subir documentos (PDF/TXT) para ingestarlos
 - Hacer preguntas en lenguaje natural
-- Ver la respuesta generada junto con las fuentes que la sustentan
+- Ver la respuesta generada en streaming junto con las fuentes que la sustentan
+- Ver cuánto tarda cada etapa (búsqueda, primer token y respuesta completa)
 """
 
 # Streamlit Cloud trae una versión vieja de sqlite3 que ChromaDB no acepta.
@@ -19,7 +20,7 @@ import os
 import tempfile
 import streamlit as st
 from ingest import ingest_file, get_chroma_collection, reset_database
-from rag import answer_question
+from rag import answer_question_stream
 
 st.set_page_config(page_title="Buscador Semántico", page_icon="🔍")
 st.title("🔍 Buscador Semántico de Documentos")
@@ -73,14 +74,24 @@ st.header("2. Hacé una pregunta")
 query = st.text_input("¿Qué querés saber sobre tus documentos?")
 
 if query:
-    with st.spinner("Buscando y generando respuesta..."):
-        result = answer_question(query)
+    with st.spinner("Buscando fragmentos relevantes..."):
+        fragments, stream, metrics = answer_question_stream(query)
 
-    st.subheader("Respuesta")
-    st.write(result["answer"])
+    if stream is None:
+        st.info("No hay documentos cargados todavía. Subí alguno en el paso 1.")
+    else:
+        st.subheader("Respuesta")
+        # write_stream va mostrando el texto a medida que llega del modelo
+        st.write_stream(stream)
 
-    if result["sources"]:
+        # Las métricas de generación se completan recién cuando terminó el stream
+        st.caption(
+            f"⏱️ Búsqueda: {metrics['search_s'] * 1000:.0f} ms · "
+            f"Primer token: {metrics.get('first_token_s', 0) * 1000:.0f} ms · "
+            f"Respuesta completa: {metrics.get('generation_s', 0):.2f} s"
+        )
+
         st.subheader("Fuentes")
-        for i, source in enumerate(result["sources"], start=1):
+        for i, source in enumerate(fragments, start=1):
             with st.expander(f"Fragmento {i} — {source['source']}"):
                 st.write(source["text"])
